@@ -2,17 +2,43 @@ let humanScore = 0;
 let computerScore = 0;
 let round = 1;
 
-function playGame(){
+const score = document.querySelector("#score");
+const choices = document.querySelector("div#choices");
+const result = document.querySelector("div#result");
 
-    while(round<=5) {
-        console.log(`Human's Score: ${humanScore}\nComputer Score: ${computerScore}`)
-        let compChoice = computerChoice();
-        let humChoice = humanChoice();
-        console.log("\n");
+function humanChoice (event){
+    switch(event.target.id){
+            case "rock": 
+                playRound(computerChoice(), "r");
+                break;
+            case "paper": 
+                playRound(computerChoice(), "p");
+                break;
+            case "scissors": 
+                playRound(computerChoice(), "s");
+                break;
+        }
+}
+choices.addEventListener("click", humanChoice);
 
-        playRound(compChoice, humChoice);
+function checkWinner(){
+    if(computerScore==5 || humanScore==5){
+        result.innerHTML = `${computerScore>humanScore ? "COMPUTER" : "HUMAN"} HAS WON A GAME`;
+        choices.removeEventListener("click", humanChoice);
+
+        result.appendChild(document.createElement("button")).innerText = "RESTART";
+        result.lastElementChild.addEventListener("click", () =>
+        {
+            result.textContent = ``;
+            score.textContent = '';
+            computerScore = 0;
+            humanScore = 0;
+            round = 1;
+            choices.addEventListener("click", humanChoice);
+            result.lastElementChild.remove();
+        }, 
+        {once: true})
     }
-    console.log(`Human's Score: ${humanScore}\nComputer Score: ${computerScore}`);
 }
 
 function playRound(compChoice, humChoice) {
@@ -28,16 +54,20 @@ function playRound(compChoice, humChoice) {
 
     if (!tie) {
         if (!win) {
-            printWinner("computer");
+            printWinner("Computer");
             computerScore++;
         } else {
-            printWinner("human");
+            printWinner("Human");
             humanScore++;
         }
     } else {
-        console.log("Tie!")
+        printTie();
     }
+    score.innerText = `ROUND ${round}
+    Human: ${humanScore}
+    Computer: ${computerScore}`
     round++;
+    checkWinner();
 }
 
 
@@ -52,13 +82,12 @@ function computerChoice() {
     }
 }
 
-function humanChoice() {
-    let choice = prompt(`ROUND ${round}\nr = rock;\np = paper;\ns = scissors`);
-    return choice;
+function printWinner(winner) {
+    result.textContent = `${winner} has won!`
 }
 
-function printWinner(winner) {
-    console.log(`Winner of the ${round} round is ${winner}`);
+function printTie() {
+    result.textContent = `Tie!`
 }
 
 function getRandomInt(max) {
